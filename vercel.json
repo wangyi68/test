@@ -20,11 +20,5 @@
       "src": "/(.*)",
       "dest": "/public/$1"
     }
-  ],
-  "functions": {
-    "api/video.js": {
-      "memory": 1024,
-      "maxDuration": 30
-    }
-  }
+  ]
 }
