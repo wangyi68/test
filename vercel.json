@@ -1,0 +1,30 @@
+{
+  "version": 3,
+  "name": "yt-downloader",
+  "builds": [
+    {
+      "src": "api/video.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "public/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/video",
+      "dest": "/api/video.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
+  ],
+  "functions": {
+    "api/video.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  }
+}

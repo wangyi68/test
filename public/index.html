@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube Downloader</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-6">
+
+<h1 class="text-4xl font-bold text-red-600 mb-6">YouTube Downloader</h1>
+
+<div class="w-full max-w-xl bg-white p-6 rounded-xl shadow-lg">
+  <input type="text" id="ytLink" placeholder="Nhập link YouTube..." class="w-full border border-gray-300 rounded p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-red-400">
+  <button id="fetchBtn" class="w-full bg-red-600 text-white p-3 rounded hover:bg-red-700 transition">Xem Thông Tin</button>
+</div>
+
+<div id="videoInfo" class="w-full max-w-xl mt-6 hidden bg-white p-4 rounded-xl shadow">
+  <div class="mb-4">
+    <iframe id="player" class="w-full h-64 md:h-96 rounded" src="" frameborder="0" allowfullscreen></iframe>
+  </div>
+  <img id="thumbnail" src="" alt="Thumbnail" class="w-full rounded mb-4">
+  <h2 id="title" class="text-lg font-bold mb-2"></h2>
+  <div id="links" class="flex flex-wrap gap-2"></div>
+</div>
+
+<script>
+const fetchBtn = document.getElementById('fetchBtn');
+const ytLink = document.getElementById('ytLink');
+const videoInfo = document.getElementById('videoInfo');
+const titleEl = document.getElementById('title');
+const thumbnailEl = document.getElementById('thumbnail');
+const linksEl = document.getElementById('links');
+const playerEl = document.getElementById('player');
+
+fetchBtn.addEventListener('click', async () => {
+  const url = ytLink.value.trim();
+  if (!url) return alert("Nhập link YouTube!");
+
+  try {
+    const res = await fetch(`/api/video?url=${encodeURIComponent(url)}`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    videoInfo.classList.remove('hidden');
+    titleEl.textContent = data.title;
+    thumbnailEl.src = data.thumbnail;
+    playerEl.src = data.embedUrl;
+
+    linksEl.innerHTML = '';
+
+    data.links.forEach(link => {
+      const a = document.createElement('a');
+      a.href = `/api/video?url=${encodeURIComponent(url)}&itag=${link.itag}`;
+      a.target = "_blank";
+      a.className = "px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition";
+      a.textContent = link.quality;
+      linksEl.appendChild(a);
+    });
+
+    const mp3Btn = document.createElement('a');
+    mp3Btn.href = `/api/video?url=${encodeURIComponent(url)}&type=mp3`;
+    mp3Btn.target = "_blank";
+    mp3Btn.className = "px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition";
+    mp3Btn.textContent = "MP3";
+    linksEl.appendChild(mp3Btn);
+
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
+  }
+});
+</script>
+</body>
+</html>
